@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RHEMA Daily</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>📖 RHEMA Daily</h1>
+      <p class="subtitle">by Nwamini Emmanuel O.</p>
+    </header>
+    <main>
+      <div class="version-selector">
+        <label for="versionSelect">Bible Version</label>
+        <select id="versionSelect">
+          <option value="en-kjv">KJV - King James</option>
+          <option value="en-asv">ASV - American Standard</option>
+          <option value="en-web">WEB - World English</option>
+        </select>
+      </div>
+      <div class="verse-card">
+        <p class="verse-text" id="verseText">Click below to receive today's verse...</p>
+        <p class="verse-ref" id="verseRef"></p>
+      </div>
+      <div class="actions">
+        <button id="getVerseBtn" class="btn primary">📖 Get Verse</button>
+        <button id="copyBtn" class="btn secondary" style="display:none">📋 Copy</button>
+      </div>
+    </main>
+    <footer>
+      <p>Daily verse at 8:00 AM ⏰</p>
+    </footer>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>

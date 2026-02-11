@@ -1,0 +1,46 @@
+{
+  "name": "rhema-desktop",
+  "version": "1.0.0",
+  "description": "RHEMA Daily Bible Verse - Desktop App",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win"
+  },
+  "author": {
+    "name": "Nwamini Emmanuel O.",
+    "url": "https://github.com/Youngemmy5956"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "sharp": "^0.34.5"
+  },
+  "build": {
+    "appId": "com.rhema.daily",
+    "productName": "RHEMA Daily",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "data/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.lifestyle",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    }
+  }
+}
