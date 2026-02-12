@@ -1,6 +1,6 @@
 {
   "name": "rhema-desktop",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "RHEMA Daily Bible Verse - Desktop App",
   "main": "src/main/main.js",
   "scripts": {
@@ -22,18 +22,37 @@
   "build": {
     "appId": "com.rhema.daily",
     "productName": "RHEMA Daily",
-    "directories": { "output": "dist" },
-    "files": ["src/**/*", "assets/**/*", "data/**/*"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "data/**/*"
+    ],
     "mac": {
       "category": "public.app-category.lifestyle",
       "icon": "assets/icon.icns",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
       "icon": "assets/icon.png",
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "publisherName": "Nwamini Emmanuel O."
     },
