@@ -1,21 +1,23 @@
 const { app, BrowserWindow, ipcMain, Notification } = require('electron');
 const path = require('path');
 const { createTray } = require('./tray');
-const { setupScheduler, showDailyVerse, fetchVerse } = require('./scheduler');
+const { setupScheduler, showDailyVerse, fetchVerse, searchVerse } = require('./scheduler');
 
 let mainWindow;
 let tray;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 480,
-    height: 640,
+    width: 620,
+    height: 700,
+    minWidth: 500,
+    minHeight: 600,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     },
     titleBarStyle: 'hiddenInset',
-    resizable: false,
+    resizable: true,
     show: false,
     icon: path.join(__dirname, '../../assets/icon.png')
   });
@@ -46,13 +48,33 @@ app.whenReady().then(() => {
   if (Notification.isSupported()) {
     new Notification({
       title: '📖 Welcome to RHEMA Daily!',
-      body: 'Your daily verse will appear at 8:00 AM. Click the tray icon to open.',
+      body: 'Your daily verse will appear at 8:00 AM.',
     }).show();
   }
 });
 
 ipcMain.handle('get-verse', async (event, version = 'en-kjv') => {
   return await fetchVerse(version);
+});
+
+ipcMain.handle('search-verse', async (event, query, version = 'en-kjv') => {
+  return await searchVerse(query, version);
+});
+
+ipcMain.handle('save-settings', async (event, settings) => {
+  // Handle auto-launch
+  app.setLoginItemSettings({
+    openAtLogin: settings.autoLaunch || false,
+    name: 'RHEMA Daily'
+  });
+
+  // Update scheduler time if changed
+  if (settings.notifTime) {
+    const [hour, minute] = settings.notifTime.split(':').map(Number);
+    setupScheduler(hour, minute, settings.notifEnabled);
+  }
+
+  return { success: true };
 });
 
 app.on('window-all-closed', () => {

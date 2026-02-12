@@ -8,31 +8,151 @@
 </head>
 <body>
   <div class="app">
-    <header>
-      <h1>📖 RHEMA Daily</h1>
-      <p class="subtitle">by Nwamini Emmanuel O.</p>
-    </header>
-    <main>
-      <div class="version-selector">
-        <label for="versionSelect">Bible Version</label>
-        <select id="versionSelect">
-          <option value="en-kjv">KJV - King James</option>
-          <option value="en-asv">ASV - American Standard</option>
-          <option value="en-web">WEB - World English</option>
-        </select>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="logo">📖</div>
+      <button class="nav-btn active" data-page="home" title="Home">🏠</button>
+      <button class="nav-btn" data-page="search" title="Search">🔍</button>
+      <button class="nav-btn" data-page="history" title="History">📜</button>
+      <button class="nav-btn" data-page="favourites" title="Favourites">🔖</button>
+      <button class="nav-btn" data-page="settings" title="Settings">⚙️</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+
+      <!-- Home Page -->
+      <div class="page active" id="page-home">
+        <div class="page-header">
+          <h1>📖 RHEMA Daily</h1>
+          <p class="subtitle">by Nwamini Emmanuel O.</p>
+        </div>
+
+        <div class="version-selector">
+          <label>Version</label>
+          <select id="versionSelect">
+            <option value="en-kjv">KJV</option>
+            <option value="en-asv">ASV</option>
+            <option value="en-web">WEB</option>
+          </select>
+        </div>
+
+        <div class="verse-card" id="verseCard">
+          <p class="verse-text" id="verseText">Click below to receive today's verse...</p>
+          <p class="verse-ref" id="verseRef"></p>
+        </div>
+
+        <div class="actions">
+          <button id="getVerseBtn" class="btn primary">📖 Get Verse</button>
+          <button id="copyBtn" class="btn secondary" style="display:none">📋 Copy</button>
+          <button id="favouriteBtn" class="btn secondary" style="display:none">🔖 Save</button>
+          <button id="shareBtn" class="btn secondary" style="display:none">📤 Share</button>
+        </div>
+
+        <!-- Share Menu -->
+        <div class="share-menu" id="shareMenu" style="display:none">
+          <button class="share-option" data-platform="twitter">🐦 Twitter</button>
+          <button class="share-option" data-platform="whatsapp">💬 WhatsApp</button>
+          <button class="share-option" data-platform="copy">📋 Copy Link</button>
+        </div>
       </div>
-      <div class="verse-card">
-        <p class="verse-text" id="verseText">Click below to receive today's verse...</p>
-        <p class="verse-ref" id="verseRef"></p>
+
+      <!-- Search Page -->
+      <div class="page" id="page-search">
+        <div class="page-header">
+          <h2>🔍 Search Verse</h2>
+        </div>
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="e.g. John 3:16 or Genesis 1" />
+          <select id="searchVersion">
+            <option value="en-kjv">KJV</option>
+            <option value="en-asv">ASV</option>
+            <option value="en-web">WEB</option>
+          </select>
+          <button id="searchBtn" class="btn primary">Search</button>
+        </div>
+        <div class="verse-card" id="searchResult" style="display:none">
+          <p class="verse-text" id="searchText"></p>
+          <p class="verse-ref" id="searchRef"></p>
+          <div class="actions" style="margin-top:16px">
+            <button id="searchCopyBtn" class="btn secondary">📋 Copy</button>
+            <button id="searchFavBtn" class="btn secondary">🔖 Save</button>
+          </div>
+        </div>
+        <div id="chapterResults" class="chapter-results"></div>
       </div>
-      <div class="actions">
-        <button id="getVerseBtn" class="btn primary">📖 Get Verse</button>
-        <button id="copyBtn" class="btn secondary" style="display:none">📋 Copy</button>
+
+      <!-- History Page -->
+      <div class="page" id="page-history">
+        <div class="page-header">
+          <h2>📜 Verse History</h2>
+          <button id="clearHistory" class="btn danger small">Clear</button>
+        </div>
+        <div id="historyList" class="verse-list"></div>
+        <p class="empty-state" id="historyEmpty">No verses viewed yet</p>
       </div>
+
+      <!-- Favourites Page -->
+      <div class="page" id="page-favourites">
+        <div class="page-header">
+          <h2>�� Favourites</h2>
+          <button id="clearFavourites" class="btn danger small">Clear</button>
+        </div>
+        <div id="favouritesList" class="verse-list"></div>
+        <p class="empty-state" id="favouritesEmpty">No favourites saved yet</p>
+      </div>
+
+      <!-- Settings Page -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <h2>⚙️ Settings</h2>
+        </div>
+
+        <div class="settings-group">
+          <h3>🔔 Notifications</h3>
+          <div class="setting-item">
+            <label>Daily verse time</label>
+            <input type="time" id="notifTime" value="08:00" />
+          </div>
+          <div class="setting-item">
+            <label>Enable daily verse</label>
+            <input type="checkbox" id="notifEnabled" checked />
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>🎨 Appearance</h3>
+          <div class="setting-item">
+            <label>Theme</label>
+            <select id="themeSelect">
+              <option value="dark">🌙 Dark</option>
+              <option value="light">☀️ Light</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3>🚀 System</h3>
+          <div class="setting-item">
+            <label>Launch at startup</label>
+            <input type="checkbox" id="autoLaunch" />
+          </div>
+          <div class="setting-item">
+            <label>Default Bible version</label>
+            <select id="defaultVersion">
+              <option value="en-kjv">KJV - King James</option>
+              <option value="en-asv">ASV - American Standard</option>
+              <option value="en-web">WEB - World English</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="saveSettings" class="btn primary">💾 Save Settings</button>
+        <p id="settingsSaved" class="success-msg" style="display:none">✅ Settings saved!</p>
+      </div>
+
     </main>
-    <footer>
-      <p>Daily verse at 8:00 AM ⏰</p>
-    </footer>
   </div>
   <script src="renderer.js"></script>
 </body>

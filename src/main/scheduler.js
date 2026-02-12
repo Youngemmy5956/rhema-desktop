@@ -1,6 +1,5 @@
 const { Notification } = require('electron');
 
-// Full list of Bible books for random selection
 const BOOKS = [
   'genesis', 'exodus', 'leviticus', 'numbers', 'deuteronomy',
   'joshua', 'judges', 'ruth', '1-samuel', '2-samuel',
@@ -27,40 +26,76 @@ const CHAPTER_COUNTS = {
   'philippians': 4, 'revelation': 22
 };
 
-function getDefaultChapterCount(book) {
-  return CHAPTER_COUNTS[book] || 5;
+function formatBook(book) {
+  return book.toLowerCase().trim().replace(/\s+/g, '-');
+}
+
+function displayBook(book) {
+  return book.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
 async function fetchVerse(version = 'en-kjv') {
   const book = BOOKS[Math.floor(Math.random() * BOOKS.length)];
-  const maxChapter = getDefaultChapterCount(book);
+  const maxChapter = CHAPTER_COUNTS[book] || 5;
   const chapter = Math.floor(Math.random() * maxChapter) + 1;
 
   const url = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/${version}/books/${book}/chapters/${chapter}.json`;
-
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch ${book} ${chapter}`);
+  if (!res.ok) throw new Error(`Failed to fetch`);
 
   const data = await res.json();
   const verses = data.data;
   const randomVerse = verses[Math.floor(Math.random() * verses.length)];
 
-  const bookDisplay = book.replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
-
   return {
     text: randomVerse.text,
-    reference: `${bookDisplay} ${chapter}:${randomVerse.verse}`,
-    book,
-    chapter,
-    verse: randomVerse.verse
+    reference: `${displayBook(book)} ${chapter}:${randomVerse.verse}`,
+    book, chapter, verse: randomVerse.verse
   };
 }
+
+async function searchVerse(query, version = 'en-kjv') {
+  // Parse query like "John 3:16" or "Genesis 1"
+  const verseMatch = query.match(/^(.+?)\s+(\d+):(\d+)$/);
+  const chapterMatch = query.match(/^(.+?)\s+(\d+)$/);
+
+  if (verseMatch) {
+    const [, bookRaw, chapter, verse] = verseMatch;
+    const book = formatBook(bookRaw);
+    const url = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/${version}/books/${book}/chapters/${chapter}.json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Not found');
+    const data = await res.json();
+    const found = data.data.find(v => String(v.verse) === String(verse));
+    if (!found) throw new Error('Verse not found');
+    return {
+      type: 'verse',
+      text: found.text,
+      reference: `${displayBook(book)} ${chapter}:${verse}`,
+      book, chapter, verse
+    };
+  } else if (chapterMatch) {
+    const [, bookRaw, chapter] = chapterMatch;
+    const book = formatBook(bookRaw);
+    const url = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/${version}/books/${book}/chapters/${chapter}.json`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Not found');
+    const data = await res.json();
+    return {
+      type: 'chapter',
+      reference: `${displayBook(book)} ${chapter}`,
+      verses: data.data
+    };
+  }
+
+  throw new Error('Invalid query format');
+}
+
+let schedulerInterval = null;
 
 async function showDailyVerse() {
   try {
     const verse = await fetchVerse();
-
     if (Notification.isSupported()) {
       new Notification({
         title: '📖 RHEMA Daily',
@@ -68,24 +103,23 @@ async function showDailyVerse() {
         body: verse.text,
       }).show();
     }
-
     return verse;
   } catch (err) {
     console.error('Failed to fetch verse:', err.message);
-    return {
-      text: 'For God so loved the world that he gave his one and only Son.',
-      reference: 'John 3:16'
-    };
+    return { text: 'For God so loved the world.', reference: 'John 3:16' };
   }
 }
 
-function setupScheduler() {
-  setInterval(() => {
+function setupScheduler(hour = 8, minute = 0, enabled = true) {
+  if (schedulerInterval) clearInterval(schedulerInterval);
+  if (!enabled) return;
+
+  schedulerInterval = setInterval(() => {
     const now = new Date();
-    if (now.getHours() === 8 && now.getMinutes() === 0) {
+    if (now.getHours() === hour && now.getMinutes() === minute) {
       showDailyVerse();
     }
   }, 60 * 1000);
 }
 
-module.exports = { setupScheduler, showDailyVerse, fetchVerse };
+module.exports = { setupScheduler, showDailyVerse, fetchVerse, searchVerse };
