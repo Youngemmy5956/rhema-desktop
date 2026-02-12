@@ -21,6 +21,60 @@ let history = JSON.parse(localStorage.getItem('rhema-history') || '[]');
 let favourites = JSON.parse(localStorage.getItem('rhema-favourites') || '[]');
 let settings = JSON.parse(localStorage.getItem('rhema-settings') || '{}');
 
+// ---- Share Links ----
+const SHARE_LINKS = {
+  cli: 'https://www.npmjs.com/package/rhema-daily',
+  desktop: 'https://github.com/Youngemmy5956/rhema-desktop/releases/latest',
+  mac: 'https://github.com/Youngemmy5956/rhema-desktop/releases/download/v2.0.0/RHEMA.Daily-2.0.0-arm64.dmg',
+  windows: 'https://github.com/Youngemmy5956/rhema-desktop/releases/download/v2.0.0/RHEMA.Daily.Setup.2.0.0.exe',
+  github: 'https://github.com/Youngemmy5956/rhema'
+};
+
+function buildShareText(verse) {
+  return `"${verse.text}"
+— ${verse.reference}
+
+📖 Get daily Bible verses with RHEMA Daily!
+
+💻 CLI Tool (macOS & Windows):
+npm install -g rhema-daily
+${SHARE_LINKS.cli}
+
+🖥️ Desktop App:
+- macOS: ${SHARE_LINKS.mac}
+- Windows: ${SHARE_LINKS.windows}
+- All releases: ${SHARE_LINKS.desktop}
+
+⭐ GitHub: ${SHARE_LINKS.github}`;
+}
+
+function buildTwitterText(verse) {
+  return `"${verse.text}" — ${verse.reference}
+
+📖 Get daily Bible verses with RHEMA Daily!
+
+🖥️ Desktop App: ${SHARE_LINKS.desktop}
+💻 CLI: ${SHARE_LINKS.cli}
+
+#Bible #BibleVerse #RHEMA #Faith`;
+}
+
+function buildWhatsAppText(verse) {
+  return `*"${verse.text}"*
+— _${verse.reference}_
+
+📖 *RHEMA Daily* - Get daily Bible verse notifications!
+
+🖥️ *Desktop App (macOS & Windows):*
+${SHARE_LINKS.desktop}
+
+💻 *CLI Tool:*
+\`npm install -g rhema-daily\`
+${SHARE_LINKS.cli}
+
+⭐ GitHub: ${SHARE_LINKS.github}`;
+}
+
 // ---- Apply saved settings on load ----
 function applySettings() {
   if (settings.theme === 'light') {
@@ -70,8 +124,6 @@ getVerseBtn.addEventListener('click', async () => {
     copyBtn.style.display = 'inline-block';
     favouriteBtn.style.display = 'inline-block';
     shareBtn.style.display = 'inline-block';
-
-    // Add to history
     addToHistory(currentVerse);
   } catch (err) {
     verseText.textContent = 'Could not load verse. Check your connection!';
@@ -105,15 +157,15 @@ shareBtn.addEventListener('click', () => {
 document.querySelectorAll('.share-option').forEach(btn => {
   btn.addEventListener('click', () => {
     if (!currentVerse) return;
-    const text = `"${currentVerse.text}" — ${currentVerse.reference}\n\nShared from RHEMA Daily`;
-    const encoded = encodeURIComponent(text);
 
     if (btn.dataset.platform === 'twitter') {
-      shell.openExternal(`https://twitter.com/intent/tweet?text=${encoded}`);
+      const text = encodeURIComponent(buildTwitterText(currentVerse));
+      shell.openExternal(`https://twitter.com/intent/tweet?text=${text}`);
     } else if (btn.dataset.platform === 'whatsapp') {
-      shell.openExternal(`https://wa.me/?text=${encoded}`);
+      const text = encodeURIComponent(buildWhatsAppText(currentVerse));
+      shell.openExternal(`https://wa.me/?text=${text}`);
     } else if (btn.dataset.platform === 'copy') {
-      clipboard.writeText(text);
+      clipboard.writeText(buildShareText(currentVerse));
       btn.textContent = '✅ Copied!';
       setTimeout(() => btn.textContent = '📋 Copy Link', 2000);
     }
@@ -287,14 +339,12 @@ document.getElementById('saveSettings').addEventListener('click', async () => {
 
   localStorage.setItem('rhema-settings', JSON.stringify(settings));
 
-  // Apply theme immediately
   if (settings.theme === 'light') {
     document.body.classList.add('light-theme');
   } else {
     document.body.classList.remove('light-theme');
   }
 
-  // Send settings to main process
   await ipcRenderer.invoke('save-settings', settings);
 
   const msg = document.getElementById('settingsSaved');
