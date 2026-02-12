@@ -20,8 +20,8 @@
 | Platform | Download |
 |----------|---------|
 | macOS (Apple Silicon) | [RHEMA Daily-1.0.0-arm64.dmg](https://github.com/Youngemmy5956/rhema-desktop/releases/latest) |
-| macOS (Intel) | Coming soon |
-| Windows | Coming soon |
+| Windows (Installer) | [RHEMA Daily Setup 1.0.0.exe](https://github.com/Youngemmy5956/rhema-desktop/releases/latest) |
+| Windows (Portable) | [RHEMA Daily 1.0.0.exe](https://github.com/Youngemmy5956/rhema-desktop/releases/latest) |
 
 ## 🚀 Install from Source
 ```bash
@@ -38,9 +38,19 @@ npm run build:mac
 
 # Windows
 npm run build:win
+
+# Both
+npm run build:all
 ```
 
-## 👨‍💻 Author
+## ⚠️ macOS Security Note
+
+If macOS blocks the app, run:
+```bash
+xattr -cr /Applications/RHEMA\ Daily.app
+```
+
+## ��‍💻 Author
 
 **Nwamini Emmanuel O.**
 - GitHub: [@Youngemmy5956](https://github.com/Youngemmy5956)
